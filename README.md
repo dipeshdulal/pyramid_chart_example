@@ -1,44 +1,92 @@
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+#### `Chart.JS` Pyramid Chart (Stacked Axis Chart) Example. 
 
-## Available Scripts
+`Chartjs` | `React` | `Javascript`
 
-In the project directory, you can run:
+![pyramid-chart-output](pyramid_output.png)
 
-### `yarn start`
+For documentation of chart.js check [here](https://www.chartjs.org)
 
-Runs the app in the development mode.<br />
-Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
+To learn about what the code in there does, Check out this medium article and give some claps :bow: :+1:
 
-The page will reload if you make edits.<br />
-You will also see any lint errors in the console.
+https://medium.com/wesionary-team/pyramid-chart-with-chart-js-and-react-16a1916d5221
 
-### `yarn test`
 
-Launches the test runner in the interactive watch mode.<br />
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+**TL;DR:** Use negative values for one data point and then customize tool tips and x-axis ticks to show positive numbers although they are negative numbers.
 
-### `yarn build`
+#### DATASET
+```js
+const barChartData: Chart.ChartData = {
+  labels: ["January", "February", "March", "April", "May", "June", "July"],
+  datasets: [
+    {
+      label: "Male",
+      stack: "Stack 0",
+      backgroundColor: "#d41111",
+      data: [10, 20, 30, 40, 50, 60],
+    },
+    {
+      label: "Female",
+      stack: "Stack 0",
+      backgroundColor: "#3765b0",
+      data: [10, 15, 30, 60, 50].map((k) => -k),
+    },
+  ],
+};
 
-Builds the app for production to the `build` folder.<br />
-It correctly bundles React in production mode and optimizes the build for the best performance.
+```
 
-The build is minified and the filenames include the hashes.<br />
-Your app is ready to be deployed!
-
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
-
-### `yarn eject`
-
-**Note: this is a one-way operation. Once you `eject`, you can’t go back!**
-
-If you aren’t satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
-
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you’re on your own.
-
-You don’t have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn’t feel obligated to use this feature. However we understand that this tool wouldn’t be useful if you couldn’t customize it when you are ready for it.
-
-## Learn More
-
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
-
-To learn React, check out the [React documentation](https://reactjs.org/).
+#### `Chart.JS` CONFIGURATION
+```js
+new Chart(ctx, {
+        type: "horizontalBar",
+        data: barChartData,
+        options: {
+          title: {
+            display: true,
+            text: "Chart.js Bar Chart - Stacked",
+          },
+          tooltips: {
+            intersect: false,
+            callbacks: {
+              label: (c) => {
+                const value = Number(c.value);
+                const positiveOnly = value < 0 ? -value : value;
+                let retStr = "";
+                if (c.datasetIndex === 0) {
+                  retStr += `Male: ${positiveOnly.toString()}`;
+                } else {
+                  retStr += `Female: ${positiveOnly.toString()}`;
+                }
+                return retStr;
+              },
+            },
+          },
+          responsive: true,
+          legend: {
+            position: "bottom",
+          },
+          scales: {
+            xAxes: [
+              {
+                stacked: false,
+                ticks: {
+                  beginAtZero: true,
+                  callback: (v) => {
+                    return v < 0 ? -v : v;
+                  },
+                },
+              },
+            ],
+            yAxes: [
+              {
+                stacked: true,
+                ticks: {
+                  beginAtZero: true,
+                },
+                position: "left",
+              }
+            ],
+          },
+        },
+      });
+```
